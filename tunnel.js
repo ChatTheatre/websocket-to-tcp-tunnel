@@ -30,7 +30,6 @@ webServer.on('connection', function (server) {
         console.log('Opened tunnel to TEC.');
     });
     tunnel.on('data', function (data) {
-        console.log('TEC sent ' + data);
         server.send(data);
     });
     tunnel.on('close', function () {
@@ -39,7 +38,6 @@ webServer.on('connection', function (server) {
     });
 
     server.on('message', function (message) {
-        console.log('Forwarding ' + message);
         tunnel.write(message);
     });
 });
