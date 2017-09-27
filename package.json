@@ -1,0 +1,23 @@
+{
+  "name": "tec_tunnel",
+  "version": "1.0.0",
+  "description": "A websocket tunnel to TEC.",
+  "main": "tunnel.js",
+  "dependencies": {
+    "ws": "^3.2.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "websocket",
+    "tunnel",
+    "tec",
+    "skotos",
+    "eternal",
+    "city"
+  ],
+  "author": "ToothlessRebel",
+  "license": "MIT"
+}

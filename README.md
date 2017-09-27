@@ -1,2 +1,2 @@
-# websocket-to-tcp-tunnel
-Tunnel connecting a client to a telnet backend
+# TEC Tunnel
+WebSocket tunnel proof of concept for TEC.
