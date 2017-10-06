@@ -1,8 +1,8 @@
 {
-  "name": "tec_tunnel",
-  "version": "1.0.0",
-  "description": "A websocket tunnel to TEC.",
-  "main": "tunnel.js",
+  "name": "websocket-tcp-tunnel",
+  "version": "1.0.0-beta",
+  "description": "A websocket tunnel to TCP socket.",
+  "main": "main.js",
   "dependencies": {
     "ws": "^3.2.0"
   },
@@ -13,11 +13,8 @@
   "keywords": [
     "websocket",
     "tunnel",
-    "tec",
-    "skotos",
-    "eternal",
-    "city"
+    "tcp"
   ],
-  "author": "ToothlessRebel",
+  "author": "toothlessrebel",
   "license": "MIT"
 }
