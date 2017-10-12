@@ -5,9 +5,9 @@
 // The port numbers to be used for the relay.
 var ports = {
     listen: 6001, // The port the WebSocket is listening on.
-    send: 6730    // The port on which to connect to the game.
+    send: 6730    // The port on which to connect to the TCP socket.
 };
-// The URL on which the game is located.
+// The URL on which the TCP socket is located.
 var forward_url = 'tec.skotos.net';
 
 /**
@@ -22,12 +22,20 @@ var webServer = new WebSocketServer({
 webServer.on('connection', function (server) {
     console.log('Starting relay for new client.');
 
-    // Create connection to game socket.
+    // Create connection to TCP socket.
     var tunnel = require('net').Socket();
+    // Enable keep-alive.
+    tunnel.setKeepAlive(true);
+
     tunnel.connect(ports.send, forward_url, function () {
         console.log('Opened tunnel to TEC.');
     });
-    // When the game socket receives new data relay it to the WebSocket.
+    // Should the TCP socket emit an error, handle it.
+    tunnel.on('error', function () {
+        console.log('Tunnel threw error.');
+        server.send('Error in relay. Please restart.');
+    });
+    // When the TCP socket receives new data relay it to the WebSocket.
     tunnel.on('data', function (data) {
         server.send(data);
     });
