@@ -16,6 +16,11 @@ let webServer = new WebSocketServer({
 // Listen to WebSocket
 webServer.on('connection', function (server) {
     console.log('Starting relay for new client.');
+    // Properly volley the ping-pong.
+    server.isAlive = true;
+    server.on('pong', function () {
+        this.isAlive = true;
+    });
 
     let tunnel = require('./src/TcpSocket')(forward_url, ports.send);
     tunnel.receive((message) => {
@@ -30,5 +35,19 @@ webServer.on('connection', function (server) {
         tunnel.send(message);
     });
 });
+
+// Regularly ping the connections.
+setInterval(() => {
+    webServer.clients.forEach(function each(ws) {
+        if (ws.isAlive === false) {
+            console.log('Connection closed due to lack of heartbeat.');
+            return ws.terminate();
+        }
+
+        ws.isAlive = false;
+        ws.ping('', false, true);
+    });
+}, 30000);
+
 // Start-up message.
 console.log('WebSockets listening on port ' + ports.listen);
