@@ -1,53 +1,68 @@
 /**
- * Configuration variables.
+ * Read in server configurations from the configuration file.
  */
-let ports = {
-    listen: 6001, // The port the WebSocket is listening on.
-    send: 6730    // The port on which to connect to the TCP socket.
-};
-// The URL on which the TCP socket is located.
-let forward_url = 'tec.skotos.net';
+let servers = JSON.parse(require('fs').readFileSync('./servers.json'));
 
-let WebSocketServer = require('ws').Server;
-let webServer = new WebSocketServer({
-    port: ports.listen
-});
+/**
+ * Forever is a Node.js process deamonizer. This should prevent the need for
+ * manual interaction when one of the relays is unexpectedly stopped.
+ */
+let forever = require('forever-monitor');
 
-// Listen to WebSocket
-webServer.on('connection', function (server) {
-    console.log('Starting relay for new client.');
-    // Properly volley the ping-pong.
-    server.isAlive = true;
-    server.on('pong', function () {
-        this.isAlive = true;
+/**
+ * Binds necessary listeners to the child process.
+ *
+ * @param child
+ * @param server
+ * @returns {*}
+ */
+function bindChildListeners(child, server) {
+    child.on('watch:restart', event => {
+        console.log(server + ' listener restarted due to change in file ' + event.file);
     });
 
-    let tunnel = require('./src/TcpSocket')(forward_url, ports.send);
-    tunnel.receive((message) => {
-        server.send(message);
-    });
-    tunnel.connect(() => {
-        console.log('Opened tunnel to TEC.');
+    child.on('start', event => {
+        console.log(server + ' started with PID ', event.child.pid);
     });
 
-    // When the WebSocket receives data relay it to the TCP tunnel.
-    server.on('message', function (message) {
-        tunnel.send(message);
+    child.on('restart', () => {
+        console.log(server + ' restarted, ' + child.times + ' times now.');
     });
-});
 
-// Regularly ping the connections.
-setInterval(() => {
-    webServer.clients.forEach(function each(ws) {
-        if (ws.isAlive === false) {
-            console.log('Connection closed due to lack of heartbeat.');
-            return ws.terminate();
-        }
-
-        ws.isAlive = false;
-        ws.ping('', false, true);
+    child.on('exit', () => {
+        console.log(server + ' has exited permanently.');
     });
-}, 30000);
 
-// Start-up message.
-console.log('WebSockets listening on port ' + ports.listen);
+    return child;
+}
+
+/**
+ * Spawns a new child of the Forever monitor.
+ *
+ * @param listen
+ * @param send
+ * @param host
+ * @param name
+ * @returns {*}
+ */
+function spawnChild(listen, send, host, name) {
+    return new (forever.Monitor)('relay.js', {
+        max: 1,
+        args: [
+            '--listen=' + listen,
+            '--send=' + send,
+            '--host=' + host,
+            '--name=' + name
+        ],
+        sourceDir: 'src'
+    });
+}
+
+for (let server in servers) {
+    if (servers.hasOwnProperty(server)) {
+        let child = spawnChild(servers[server].listen, servers[server].send, servers[server].host, servers[server].name);
+        bindChildListeners(child, servers[server].name);
+
+        child.start();
+    }
+}
