@@ -47,7 +47,6 @@ function bindChildListeners(child, server) {
  */
 function spawnChild(listen, send, host, name) {
     return new (forever.Monitor)('relay.js', {
-        max: 1,
         args: [
             '--listen=' + listen,
             '--send=' + send,
