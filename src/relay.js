@@ -24,7 +24,7 @@ webServer.on('connection', function (client) {
         this.isAlive = true;
     });
 
-    let tunnel = require('TcpSocket')(args.host, args.send);
+    let tunnel = require('./TcpSocket')(args.host, args.send);
     tunnel.receive((message) => {
         if (client.readyState === client.OPEN) {
             client.send(message);
