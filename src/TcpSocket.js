@@ -1,4 +1,6 @@
 module.exports = (host, port) => {
+    // Common logging object.
+    let logger = new require('./Logger')();
     // Create connection to TCP socket.
     let socket = require('net').Socket();
     // Enable keep-alive.
@@ -6,14 +8,13 @@ module.exports = (host, port) => {
 
     // Should the TCP socket emit an error, handle it.
     socket.on('error', function () {
-        console.log('Tunnel threw error.');
+        logger.log('Tunnel threw error.');
     });
     // Should the TCP socket become inaccessible, free it on this end.
     socket.on('close', function () {
-        console.log('Tunnel collapsed.');
+        logger.log('Tunnel collapsed.');
         socket.destroy();
     });
-    console.log(socket);
 
     return {
         connect: (callback) => {

@@ -1,11 +1,15 @@
 /**
+ * Common Logger object to format logs.
+ */
+let logger = new require('./src/Logger')();
+/**
  * Read in server configurations from the configuration file.
  */
 let config = undefined;
 try {
     config = JSON.parse(require('fs').readFileSync('./config.json'));
 } catch (error) {
-    console.error('Configuration file missing or improperly formatted.')
+    logger.error('Configuration file missing or improperly formatted.');
     process.exit(1);
 }
 
@@ -24,19 +28,19 @@ let forever = require('forever-monitor');
  */
 function bindChildListeners(child, server) {
     child.on('watch:restart', event => {
-        console.log(server + ' listener restarted due to change in file ' + event.file);
+        logger.log(server + ' listener restarted due to change in file ' + event.file);
     });
 
     child.on('start', event => {
-        console.log(server + ' started with PID ', event.child.pid);
+        logger.log(server + ' started with PID ' + event.child.pid);
     });
 
     child.on('restart', () => {
-        console.log(server + ' restarted, ' + child.times + ' times now.');
+        logger.log(server + ' restarted, ' + child.times + '/10 times now.');
     });
 
     child.on('exit', () => {
-        console.log(server + ' has exited permanently.');
+        logger.log(server + ' has exited permanently.');
     });
 
     return child;
@@ -59,9 +63,9 @@ function spawnChild(listen, send, host, name) {
     outFile += instanceFileName + '.log';
     let errorFile = config.logDirectory.endsWith('/') ? config.logDirectory : config.logDirectory + '/';
     errorFile += instanceFileName + '.error';
-    console.log(pidFile);
+    logger.log(pidFile);
 
-    return new (forever.Monitor)('relay.js', {
+    return new (forever.Monitor)('Relay.js', {
         args: [
             '--listen=' + listen,
             '--send=' + send,
@@ -79,6 +83,9 @@ function spawnChild(listen, send, host, name) {
     });
 }
 
+/**
+ * Setup each relay defined in the configuration file.
+ */
 for (let server in config.servers) {
     if (config.servers.hasOwnProperty(server)) {
         let child = spawnChild(
