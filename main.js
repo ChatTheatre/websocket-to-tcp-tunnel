@@ -1,7 +1,13 @@
 /**
  * Read in server configurations from the configuration file.
  */
-let servers = JSON.parse(require('fs').readFileSync('./servers.json'));
+let config = undefined;
+try {
+    config = JSON.parse(require('fs').readFileSync('./config.json'));
+} catch (error) {
+    console.error('Configuration file missing or improperly formatted.')
+    process.exit(1);
+}
 
 /**
  * Forever is a Node.js process deamonizer. This should prevent the need for
@@ -46,6 +52,15 @@ function bindChildListeners(child, server) {
  * @returns {*}
  */
 function spawnChild(listen, send, host, name) {
+    let instanceFileName = name.toLowerCase().replace(/\s/g, '_');
+    let pidFile = config.pidFileDirectory.endsWith('/') ? config.pidFileDirectory : config.pidFileDirectory + '/';
+    pidFile += instanceFileName + '.pid';
+    let outFile = config.logDirectory.endsWith('/') ? config.logDirectory : config.logDirectory + '/';
+    outFile += instanceFileName + '.log';
+    let errorFile = config.logDirectory.endsWith('/') ? config.logDirectory : config.logDirectory + '/';
+    errorFile += instanceFileName + '.error';
+    console.log(pidFile);
+
     return new (forever.Monitor)('relay.js', {
         args: [
             '--listen=' + listen,
@@ -53,14 +68,26 @@ function spawnChild(listen, send, host, name) {
             '--host=' + host,
             '--name=' + name
         ],
-        sourceDir: 'src'
+        killTree: true,
+        sourceDir: 'src',
+        max: 10,
+        pidFile: pidFile,
+        watch: true,
+        watchDirectory: './',
+        outFile: outFile,
+        errorFile: errorFile
     });
 }
 
-for (let server in servers) {
-    if (servers.hasOwnProperty(server)) {
-        let child = spawnChild(servers[server].listen, servers[server].send, servers[server].host, servers[server].name);
-        bindChildListeners(child, servers[server].name);
+for (let server in config.servers) {
+    if (config.servers.hasOwnProperty(server)) {
+        let child = spawnChild(
+            config.servers[server].listen,
+            config.servers[server].send,
+            config.servers[server].host,
+            config.servers[server].name
+        );
+        bindChildListeners(child, config.servers[server].name);
 
         child.start();
     }

@@ -1,8 +1,0 @@
-[
-  {
-    "name": "My Server",
-    "listen": 1234,
-    "send": 1235,
-    "host": "domain.tld"
-  }
-]

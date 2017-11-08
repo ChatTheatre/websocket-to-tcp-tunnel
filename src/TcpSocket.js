@@ -13,6 +13,7 @@ module.exports = (host, port) => {
         console.log('Tunnel collapsed.');
         socket.destroy();
     });
+    console.log(socket);
 
     return {
         connect: (callback) => {
@@ -23,6 +24,9 @@ module.exports = (host, port) => {
         },
         send: (message) => {
             socket.write(message);
+        },
+        close: () => {
+            socket.end();
         },
         socket: socket
     };
