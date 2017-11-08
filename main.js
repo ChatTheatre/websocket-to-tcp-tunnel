@@ -19,6 +19,15 @@ try {
  */
 let forever = require('forever-monitor');
 
+let instanceFileName = function(string) {
+    return string.toLowerCase().replace(/\s/g, '_');
+};
+
+let writePidFile = function(file, pid) {
+    let path = config.pidFileDirectory.endsWith('/') ? config.pidFileDirectory : config.pidFileDirectory + '/';
+    require('fs').writeFileSync(path + file, pid);
+};
+
 /**
  * Binds necessary listeners to the child process.
  *
@@ -27,16 +36,20 @@ let forever = require('forever-monitor');
  * @returns {*}
  */
 function bindChildListeners(child, server) {
+    let pidFile = instanceFileName(server) + '.pid';
+
     child.on('watch:restart', event => {
         logger.log(server + ' listener restarted due to change in file ' + event.file);
     });
 
     child.on('start', event => {
         logger.log(server + ' started with PID ' + event.child.pid);
+        writePidFile(pidFile, event.child.pid);
     });
 
     child.on('restart', () => {
         logger.log(server + ' restarted, ' + child.times + '/10 times now.');
+        writePidFile(pidFile, event.child.pid);
     });
 
     child.on('exit', () => {
@@ -56,14 +69,10 @@ function bindChildListeners(child, server) {
  * @returns {*}
  */
 function spawnChild(listen, send, host, name) {
-    let instanceFileName = name.toLowerCase().replace(/\s/g, '_');
-    let pidFile = config.pidFileDirectory.endsWith('/') ? config.pidFileDirectory : config.pidFileDirectory + '/';
-    pidFile += instanceFileName + '.pid';
     let outFile = config.logDirectory.endsWith('/') ? config.logDirectory : config.logDirectory + '/';
-    outFile += instanceFileName + '.log';
+    outFile += instanceFileName(name) + '.log';
     let errorFile = config.logDirectory.endsWith('/') ? config.logDirectory : config.logDirectory + '/';
-    errorFile += instanceFileName + '.error';
-    logger.log(pidFile);
+    errorFile += instanceFileName(name) + '.error';
 
     return new (forever.Monitor)('Relay.js', {
         args: [
@@ -75,13 +84,17 @@ function spawnChild(listen, send, host, name) {
         killTree: true,
         sourceDir: 'src',
         max: 10,
-        pidFile: pidFile,
         watch: true,
         watchDirectory: './',
         outFile: outFile,
         errorFile: errorFile
     });
 }
+
+/**
+ * Write the master PID file.
+ */
+writePidFile('tunnel.pid', process.pid);
 
 /**
  * Setup each relay defined in the configuration file.
