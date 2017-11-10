@@ -52,6 +52,12 @@ webServer.on('connection', function (client, request) {
     client.on('message', function (message) {
         client.tunnel.send(message);
     });
+
+    for (let header in request.headers) {
+        if (request.headers.hasOwnProperty(header)) {
+            client.send('TUNNELINFO ' + header + ':' + request.headers[header]);
+        }
+    }
 });
 
 // Regularly ping the connections.
