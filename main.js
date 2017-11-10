@@ -47,7 +47,7 @@ function bindChildListeners(child, server) {
         writePidFile(pidFile, event.child.pid);
     });
 
-    child.on('restart', () => {
+    child.on('restart', event => {
         logger.log(server + ' restarted, ' + child.times + '/10 times now.');
         writePidFile(pidFile, event.child.pid);
     });
