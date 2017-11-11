@@ -23,6 +23,8 @@ webServer.on('error', error => {
     } else {
         logger.log(args.name + ' had an error: ' + error);
     }
+
+    process.exit(1);
 });
 
 // Listen to WebSocket
