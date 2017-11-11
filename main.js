@@ -83,7 +83,7 @@ function spawnChild(listen, send, host, name) {
         ],
         killTree: true,
         sourceDir: 'src',
-        max: 100,
+        max: config.maximumRetries || 100,
         watch: true,
         watchDirectory: './',
         outFile: outFile,

@@ -1,6 +1,7 @@
 {
   "pidFileDirectory": "./",
   "logDirectory": "./logs/",
+  "maximumRetries": 100,
   "servers": [
     {
       "name": "My Server",

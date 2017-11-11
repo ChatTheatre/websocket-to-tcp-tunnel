@@ -17,6 +17,7 @@ Example:
 {
   "pidFileDirectory": "./",
   "logDirectory": "./logs/",
+  "maximumRetries": 100,
   "servers": [
     {
       "name": "My Server",
@@ -39,11 +40,16 @@ The directory in which logs are written can be defined with the `logDirectory` p
 Defaults to `./logs/`.
  
 ### Server Configurations [REQUIRED]
-Servers can be configured by adding objects to the `servers` property.
+Servers can be configured by adding objects to the property.
 * `name` is used only for identification in output.  
 * `listen` is the port on which this server should listen for incoming WebSocket connections.
 * `send` is the port on which the outgoing TCP socket should connect.
-* `host` is the host to which the outgoing TCP socket should connect.  
+* `host` is the host to which the outgoing TCP socket should connect.
+
+### Maximum Retries
+The `maximumRetries` property defines how many times Forever will restart a child before giving up.
+This is useful in preventing runaway processes.  
+Defaults to `100`.  
 
 ## Starting Relay 
 To start the relay use `node main.js &` from the root directory of the cloned repository.
