@@ -12,16 +12,18 @@ logger.log("\ton port " + args.listen);
 logger.log("\tto " + args.host + ':' + args.send);
 
 let WebSocketServer = require('ws').Server;
-let webServer = undefined;
-try {
-    webServer = new WebSocketServer({
-        port: args.listen
-    });
-} catch (exception) {
-    if (exception instanceof Error) {
+let webServer = new WebSocketServer({
+    port: args.listen
+});
+
+// Handle any errors
+webServer.on('error', error => {
+    if (error.code = 'EADDRINUSE') {
         logger.log('Could not bind port ' + args.listen + ' for ' + args.name + ', already in use.');
+    } else {
+        logger.log(args.name + ' had an error: ' + error);
     }
-}
+});
 
 // Listen to WebSocket
 webServer.on('connection', function (client, request) {

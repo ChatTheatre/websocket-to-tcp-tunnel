@@ -48,7 +48,7 @@ function bindChildListeners(child, server) {
     });
 
     child.on('restart', event => {
-        logger.log(server + ' restarted, ' + child.times + '/10 times now.');
+        logger.log(server + ' restarted, ' + child.times + '/' + child.max + ' times now.');
         writePidFile(pidFile, event.child.pid);
     });
 
@@ -83,7 +83,7 @@ function spawnChild(listen, send, host, name) {
         ],
         killTree: true,
         sourceDir: 'src',
-        max: 10,
+        max: 100,
         watch: true,
         watchDirectory: './',
         outFile: outFile,
