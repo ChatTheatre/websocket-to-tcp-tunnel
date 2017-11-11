@@ -23,9 +23,16 @@ let instanceFileName = function(string) {
     return string.toLowerCase().replace(/\s/g, '_');
 };
 
+let pidDirectory = function() {
+    return config.pidFileDirectory.endsWith('/') ? config.pidFileDirectory : config.pidFileDirectory + '/';
+};
+
 let writePidFile = function(file, pid) {
-    let path = config.pidFileDirectory.endsWith('/') ? config.pidFileDirectory : config.pidFileDirectory + '/';
-    require('fs').writeFileSync(path + file, pid);
+    require('fs').writeFileSync(pidDirectory() + file, pid);
+};
+
+let removePidFile = function(file) {
+    require('fs').unlinkSync(pidDirectory() + file);
 };
 
 /**
@@ -54,6 +61,7 @@ function bindChildListeners(child, server) {
 
     child.on('exit', () => {
         logger.log(server + ' has exited permanently.');
+        removePidFile(pidFile);
     });
 
     return child;
