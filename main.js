@@ -19,19 +19,47 @@ try {
  */
 let forever = require('forever-monitor');
 
-let instanceFileName = function(string) {
+/**
+ * Formats a string into an acceptable file name.
+ *
+ * @param string
+ * @returns {string|XML|*|void}
+ */
+let instanceFileName = function (string) {
     return string.toLowerCase().replace(/\s/g, '_');
 };
 
-let pidDirectory = function() {
-    return config.pidFileDirectory.endsWith('/') ? config.pidFileDirectory : config.pidFileDirectory + '/';
+/**
+ * Determines the directory in which to store PID files.
+ *
+ * @returns {string}
+ */
+let pidDirectory = function () {
+    let directory = './';
+
+    if (config.pidFileDirectory) {
+        directory = config.pidFileDirectory.endsWith('/') ? config.pidFileDirectory : config.pidFileDirectory + '/';
+    }
+
+    return directory;
 };
 
-let writePidFile = function(file, pid) {
+/**
+ * Handles writing PID files.
+ *
+ * @param file
+ * @param pid
+ */
+let writePidFile = function (file, pid) {
     require('fs').writeFileSync(pidDirectory() + file, pid);
 };
 
-let removePidFile = function(file) {
+/**
+ * Handles removing PID files.
+ *
+ * @param file
+ */
+let removePidFile = function (file) {
     require('fs').unlinkSync(pidDirectory() + file);
 };
 
@@ -55,7 +83,13 @@ function bindChildListeners(child, server) {
     });
 
     child.on('restart', event => {
-        logger.log(server + ' restarted, ' + child.times + '/' + child.max + ' times now.');
+        let logMessage = server + ' restarted, ' + child.times;
+        if (config.maximumRetries) {
+            logMessage += '/' + child.max;
+        }
+        logMessage += ' times now.';
+
+        logger.log(logMessage);
         writePidFile(pidFile, event.child.pid);
     });
 
@@ -77,12 +111,12 @@ function bindChildListeners(child, server) {
  * @returns {*}
  */
 function spawnChild(listen, send, host, name) {
-    let outFile = config.logDirectory.endsWith('/') ? config.logDirectory : config.logDirectory + '/';
-    outFile += instanceFileName(name) + '.log';
-    let errorFile = config.logDirectory.endsWith('/') ? config.logDirectory : config.logDirectory + '/';
-    errorFile += instanceFileName(name) + '.error';
+    let logDir = './logs/';
+    if (config.logDirectory) {
+        logDir = config.logDirectory.endsWith('/') ? config.logDirectory : config.logDirectory + '/';
+    }
 
-    return new (forever.Monitor)('Relay.js', {
+    let options = {
         args: [
             '--listen=' + listen,
             '--send=' + send,
@@ -91,12 +125,16 @@ function spawnChild(listen, send, host, name) {
         ],
         killTree: true,
         sourceDir: 'src',
-        max: config.maximumRetries || 100,
         watch: true,
         watchDirectory: './',
-        outFile: outFile,
-        errorFile: errorFile
-    });
+        outFile: logDir + instanceFileName(name) + '.log',
+        errorFile: logDir + instanceFileName(name) + '.error'
+    };
+    if (config.maximumRetries) {
+        options.max = config.maximumRetries;
+    }
+
+    return new (forever.Monitor)('Relay.js', options);
 }
 
 /**

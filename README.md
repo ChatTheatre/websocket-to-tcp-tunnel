@@ -12,7 +12,7 @@ From the new repository's root directory run `npm install`.
 
 ## Configuration
 Rename `config.json.example` to `config.json` and edit to suit your needs.  
-Example:
+Example (with all optional entries):
 ```json
 {
   "pidFileDirectory": "./",
@@ -30,15 +30,6 @@ Example:
 
 ```
 
-### PID Files
-The location of files containing PID information for each process can be defined with 
-the `pidFileDirectory` property.  
-Defaults to `./`.
-
-### Logging
-The directory in which logs are written can be defined with the `logDirectory` property.  
-Defaults to `./logs/`.
- 
 ### Server Configurations [REQUIRED]
 Servers can be configured by adding objects to the property.
 * `name` is used only for identification in output.  
@@ -46,10 +37,19 @@ Servers can be configured by adding objects to the property.
 * `send` is the port on which the outgoing TCP socket should connect.
 * `host` is the host to which the outgoing TCP socket should connect.
 
-### Maximum Retries
-The `maximumRetries` property defines how many times Forever will restart a child before giving up.
-This is useful in preventing runaway processes.  
-Defaults to `100`.  
+### PID Files [OPTIONAL]
+The location of files containing PID information for each process can be defined with 
+the `pidFileDirectory` property.  
+*Defaults to `./`.*
+
+### Logging [OPTIONAL]
+The directory in which logs are written can be defined with the `logDirectory` property.  
+*Defaults to `./logs/`.*
+
+### Maximum Retries [OPTIONAL]
+If provided the `maximumRetries` property defines how many times Forever will restart a child before giving up.
+This is useful in preventing runaway processes. If this property does not exist no limit will be set.  
+*Defaults to unlimited.*  
 
 ## Starting Relay 
 To start the relay use `node main.js &` from the root directory of the cloned repository.
