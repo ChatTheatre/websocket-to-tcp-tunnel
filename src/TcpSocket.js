@@ -8,11 +8,11 @@ module.exports = (host, port) => {
 
     // Should the TCP socket emit an error, handle it.
     socket.on('error', function (event) {
-        logger.log('Tunnel threw error: ' + event);
+        logger.log('A tunnel threw an error: ' + event);
     });
     // Should the TCP socket become inaccessible, free it on this end.
     socket.on('close', function () {
-        logger.log('Tunnel collapsed.');
+        logger.log('A tunnel collapsed.');
         socket.destroy();
     });
 

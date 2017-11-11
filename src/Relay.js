@@ -39,7 +39,17 @@ webServer.on('connection', function (client, request) {
         this.isAlive = true;
     });
 
+    // Handle closing of this end.
+    client.on('close', () => {
+        console.log('WebSocket for ' + client.incoming_ip + ' closed. Closing TCP socket.');
+        client.tunnel.close();
+    });
+
     client.tunnel = require('./TcpSocket')(args.host, args.send);
+    client.tunnel.socket.on('close', () => {
+        console.log('TCP socket for' + client.incoming_ip + ' closed. Closing WebSocket.');
+        client.close();
+    });
     client.tunnel.receive((message) => {
         if (client.readyState === client.OPEN) {
             client.send(message);
@@ -76,7 +86,7 @@ setInterval(() => {
         client.isAlive = false;
         client.ping('', false, true);
     });
-}, 30000);
+}, 5000);
 
 // Start-up message.
 logger.log(args.name + ' listening on port ' + args.listen);
