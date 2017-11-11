@@ -7,8 +7,8 @@ module.exports = (host, port) => {
     socket.setKeepAlive(true);
 
     // Should the TCP socket emit an error, handle it.
-    socket.on('error', function () {
-        logger.log('Tunnel threw error.');
+    socket.on('error', function (event) {
+        logger.log('Tunnel threw error: ' + event);
     });
     // Should the TCP socket become inaccessible, free it on this end.
     socket.on('close', function () {
