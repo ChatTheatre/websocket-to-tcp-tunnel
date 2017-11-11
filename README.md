@@ -7,7 +7,7 @@ Data between both sockets is simply echoed to the other.
 * npm - npm is used to install package dependencies.
 
 ## Installation
-Clone the repository with `git clone https://github.com/ToothlessRebel/websocket-to-tcp-tunnel.git`.  
+Clone the repository with `git clone https://github.com/skotostech/websocket-to-tcp-tunnel.git`.  
 From the new repository's root directory run `npm install`.
 
 ## Configuration
