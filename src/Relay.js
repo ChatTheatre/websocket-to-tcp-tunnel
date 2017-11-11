@@ -47,7 +47,7 @@ webServer.on('connection', function (client, request) {
 
     client.tunnel = require('./TcpSocket')(args.host, args.send);
     client.tunnel.socket.on('close', () => {
-        logger.log('TCP socket for' + client.incoming_ip + ' closed. Closing WebSocket.');
+        logger.log('TCP socket for ' + client.incoming_ip + ' closed. Closing WebSocket.');
         client.close();
     });
     client.tunnel.receive((message) => {
