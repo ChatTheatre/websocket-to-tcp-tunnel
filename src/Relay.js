@@ -69,7 +69,7 @@ webServer.on('connection', function (client, request) {
 
     for (let header in request.headers) {
         if (request.headers.hasOwnProperty(header)) {
-            client.send('TUNNELINFO ' + header + ':' + request.headers[header]);
+            client.tunnel.send('TUNNELINFO ' + header + ':' + request.headers[header] + "\n");
         }
     }
 });
