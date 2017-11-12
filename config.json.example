@@ -2,6 +2,7 @@
   "pidFileDirectory": "./",
   "logDirectory": "./logs/",
   "maximumRetries": 100,
+  "websocketHeartbeat": 15,
   "servers": [
     {
       "name": "My Server",

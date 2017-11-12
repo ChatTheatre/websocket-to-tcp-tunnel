@@ -121,7 +121,8 @@ function spawnChild(listen, send, host, name) {
             '--listen=' + listen,
             '--send=' + send,
             '--host=' + host,
-            '--name=' + name
+            '--name=' + name,
+            '--wsHeartbeat=' + (config.websocketHeartbeat || 15)
         ],
         killTree: true,
         sourceDir: 'src',

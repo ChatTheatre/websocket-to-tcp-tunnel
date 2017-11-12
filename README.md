@@ -18,6 +18,7 @@ Example (with all optional entries):
   "pidFileDirectory": "./",
   "logDirectory": "./logs/",
   "maximumRetries": 100,
+  "websocketHeartbeat": 15,
   "servers": [
     {
       "name": "My Server",
@@ -50,6 +51,11 @@ The directory in which logs are written can be defined with the `logDirectory` p
 If provided the `maximumRetries` property defines how many times Forever will restart a child before giving up.
 This is useful in preventing runaway processes. If this property does not exist no limit will be set.  
 *Defaults to unlimited.*  
+
+### Heartbeat Delay [OPTIONAL]
+The `websocketHeartbeat` will set the time between expected heartbeats for the Websocket client. 
+This is the number of seconds between consecutive heartbeats.  
+*Defaults to 15.* 
 
 ## Starting Relay 
 To start the relay use `node main.js &` from the root directory of the cloned repository.

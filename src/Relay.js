@@ -75,6 +75,7 @@ webServer.on('connection', function (client, request) {
 });
 
 // Regularly ping the connections.
+logger.log('Starting heartbeat with ' + args.wsHeartbeat + ' second delay.');
 setInterval(() => {
     webServer.clients.forEach(function each(client) {
         if (client.isAlive === false) {
@@ -86,7 +87,7 @@ setInterval(() => {
         client.isAlive = false;
         client.ping('', false, true);
     });
-}, 5000);
+}, args.wsHeartbeat * 1000);
 
 // Start-up message.
 logger.log(args.name + ' listening on port ' + args.listen);
