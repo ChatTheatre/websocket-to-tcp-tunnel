@@ -41,13 +41,13 @@ webServer.on('connection', function (client, request) {
 
     // Handle closing of this end.
     client.on('close', () => {
-        logger.log('WebSocket for ' + client.incoming_ip + ' closed. Closing TCP socket.');
+        logger.log('WebSocket for ' + client.incoming_ip + ' closed. Ensuring TCP socket closed..');
         client.tunnel.close();
     });
 
     client.tunnel = require('./TcpSocket')(args.host, args.send);
     client.tunnel.socket.on('close', () => {
-        logger.log('TCP socket for ' + client.incoming_ip + ' closed. Closing WebSocket.');
+        logger.log('TCP socket for ' + client.incoming_ip + ' closed. Ensuring WebSocket closed.');
         client.close();
     });
     client.tunnel.receive((message) => {

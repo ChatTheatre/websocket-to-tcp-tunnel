@@ -126,6 +126,7 @@ function spawnChild(listen, send, host, name) {
         ],
         killTree: true,
         sourceDir: 'src',
+        append: true,
         watch: true,
         watchDirectory: './',
         outFile: logDir + instanceFileName(name) + '.log',
