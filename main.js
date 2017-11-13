@@ -20,10 +20,7 @@ process.on('SIGTERM', () => {
     children.forEach(function (monitor) {
         logger.log('Stopping ' + monitor.name + '.');
         monitor.stop();
-        logger.log('Child ' + monitor.name + ' should have stopped.');
     });
-
-    process.exit(0);
 });
 
 /**
