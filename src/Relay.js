@@ -13,8 +13,8 @@ logger.log("\tto " + args.host + ':' + args.send);
 
 // Set up some signal handlers.
 process.on('SIGTERM', function () {
-    logger.log('Child process ending by SIGTERM.');
-    logger.log('Sending warning to all clients.');
+    logger.log(args.name + ' process ending by SIGTERM.');
+    logger.log(args.name + ' sending warning to all clients.');
     webServer.clients.forEach(function (client) {
         client.send('!! CONNECTION BEING FORCED TO CLOSE. !!');
     });

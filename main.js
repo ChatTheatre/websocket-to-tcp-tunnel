@@ -17,8 +17,10 @@ let children = [];
 process.on('SIGTERM', () => {
     logger.log('Main process going down via SIGTERM.');
     logger.log('Stopping all children.');
-    children.forEach(function (child) {
-        child.stop();
+    children.forEach(function (monitor) {
+        logger.log('Stopping ' + monitor.name + '.');
+        monitor.stop();
+        logger.log('Child ' + monitor.name + ' should have stopped.');
     });
 
     process.exit(0);
@@ -135,8 +137,8 @@ function spawnChild(listen, send, host, name) {
             '--name=' + name,
             '--wsHeartbeat=' + (config.websocketHeartbeat || 15)
         ],
-        killTree: true,
         sourceDir: 'src',
+        killTree: false,
         append: true,
         watch: true,
         watchDirectory: './',
@@ -149,7 +151,10 @@ function spawnChild(listen, send, host, name) {
         options.max = config.maximumRetries;
     }
 
-    return new (forever.Monitor)('Relay.js', options);
+    let child = new (forever.Monitor)('Relay.js', options);
+    child.name = name;
+
+    return child;
 }
 
 /**
