@@ -19,6 +19,7 @@ Example (with all optional entries):
   "logDirectory": "./logs/",
   "maximumRetries": 100,
   "websocketHeartbeat": 15,
+  "shutdownDelay": 20,
   "servers": [
     {
       "name": "My Server",
@@ -56,6 +57,11 @@ This is useful in preventing runaway processes. If this property does not exist 
 The `websocketHeartbeat` will set the time between expected heartbeats for the Websocket client. 
 This is the number of seconds between consecutive heartbeats.  
 *Defaults to 15.* 
+
+### Shutdown Delay [OPTIONAL]
+The `shutdownDelay` determines the number of seconds between a process getting a signal to shutdown
+and the exiting of the process. Connected clients of the relay will receive a message warning them
+of the shutdown and the length of the delay.  
 
 ## Starting Relay 
 To start the relay use `node main.js &` from the root directory of the cloned repository.

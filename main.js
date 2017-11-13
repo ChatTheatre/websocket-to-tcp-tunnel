@@ -21,6 +21,7 @@ process.on('SIGTERM', () => {
         logger.log('Stopping ' + monitor.name + '.');
         monitor.stop();
     });
+    logger.log('Relay service shut down.');
 });
 
 /**
@@ -132,7 +133,8 @@ function spawnChild(listen, send, host, name) {
             '--send=' + send,
             '--host=' + host,
             '--name=' + name,
-            '--wsHeartbeat=' + (config.websocketHeartbeat || 15)
+            '--wsHeartbeat=' + (config.websocketHeartbeat || 15),
+            '--shutdownDelay=' + config.shutdownDelay
         ],
         sourceDir: 'src',
         killTree: false,

@@ -3,6 +3,7 @@
   "logDirectory": "./logs/",
   "maximumRetries": 100,
   "websocketHeartbeat": 15,
+  "shutdownDelay", 20,
   "servers": [
     {
       "name": "My Server",

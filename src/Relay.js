@@ -11,22 +11,32 @@ logger.log('Starting relay for ' + args.name + '.');
 logger.log("\ton port " + args.listen);
 logger.log("\tto " + args.host + ':' + args.send);
 
-let shutdown = function (signal) {
+let shutdown = (signal) => {
+    signal = signal || 'signal';
     logger.log(args.name + ' process ending by ' + signal + '.');
     logger.log(args.name + ' sending warning to all clients.');
     webServer.clients.forEach(function (client) {
-        client.send('!! CONNECTION BEING FORCED TO CLOSE IN 20 SECONDS. !!');
+        if (args.shutdownDelay > 0) {
+            client.send('!! CONNECTION BEING FORCED TO CLOSE IN ' + args.shutdownDelay + ' SECONDS. !!');
+        } else {
+            client.send('!! CONNECTION BEING FORCED TO CLOSE IMMEDIATELY. !!');
+        }
     });
 
-    setTimeout(() => {
+    if (args.shutdownDelay > 0) {
+        setTimeout(() => {
+            logger.log(args.name + ' shut down.');
+            process.exit(0);
+        }, args.shutdownDelay * 1000);
+    } else {
         logger.log(args.name + ' shut down.');
         process.exit(0);
-    }, 20000)
+    }
 };
 
 // Set up some signal handlers.
-process.on('SIGTERM', shutdown('SIGTERM'));
-process.on('SIGINT', shutdown('SIGINT'));
+process.on('SIGTERM', shutdown);
+process.on('SIGINT', shutdown);
 
 let WebSocketServer = require('ws').Server;
 let webServer = new WebSocketServer({
