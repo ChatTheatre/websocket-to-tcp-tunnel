@@ -140,6 +140,7 @@ function spawnChild(listen, send, host, name) {
         append: true,
         watch: true,
         watchDirectory: './',
+        logFile: logDir + 'relay.log',
         outFile: logDir + instanceFileName(name) + '.log',
         errorFile: logDir + instanceFileName(name) + '.error',
         killSignal: 'SIGTERM'
