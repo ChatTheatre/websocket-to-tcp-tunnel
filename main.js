@@ -12,6 +12,17 @@ try {
     logger.error('Configuration file missing or improperly formatted.');
     process.exit(1);
 }
+let children = [];
+
+process.on('SIGTERM', () => {
+    logger.log('Main process going down via SIGTERM.');
+    logger.log('Stopping all children.');
+    children.forEach(function (child) {
+        child.stop();
+    });
+
+    process.exit(0);
+});
 
 /**
  * Forever is a Node.js process deamonizer. This should prevent the need for
@@ -130,7 +141,8 @@ function spawnChild(listen, send, host, name) {
         watch: true,
         watchDirectory: './',
         outFile: logDir + instanceFileName(name) + '.log',
-        errorFile: logDir + instanceFileName(name) + '.error'
+        errorFile: logDir + instanceFileName(name) + '.error',
+        killSignal: 'SIGTERM'
     };
     if (config.maximumRetries) {
         options.max = config.maximumRetries;
@@ -156,6 +168,7 @@ for (let server in config.servers) {
             config.servers[server].name
         );
         bindChildListeners(child, config.servers[server].name);
+        children.push(child);
 
         child.start();
     }
