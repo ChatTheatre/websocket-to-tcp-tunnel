@@ -20,11 +20,17 @@ let shutdown = (signal) => {
             client.send('!! CONNECTION BEING FORCED TO CLOSE IN ' + args.shutdownDelay + ' SECONDS. !!');
         } else {
             client.send('!! CONNECTION BEING FORCED TO CLOSE IMMEDIATELY. !!');
+            client.tunnel.close();
+            client.terminate();
         }
     });
 
     if (args.shutdownDelay > 0) {
         setTimeout(() => {
+            webServer.clients.forEach(function (client) {
+                client.tunnel.close();
+                client.terminate();
+            });
             logger.log(args.name + ' shut down.');
             process.exit(0);
         }, args.shutdownDelay * 1000);
