@@ -1,35 +1,25 @@
-/**
- * Common Logger object to format logs.
- */
-let logger = new require('./src/Logger')();
-/**
- * Read in server configurations from the configuration file.
- */
 let config = undefined;
-try {
-    config = JSON.parse(require('fs').readFileSync('./config.json'));
-} catch (error) {
-    logger.error('Configuration file missing or improperly formatted.');
-    process.exit(1);
-}
 let children = [];
-
-process.on('SIGTERM', () => {
-    logger.log('Main process going down via SIGTERM.');
-    logger.log('Stopping all children.');
-    children.forEach(function (monitor) {
-        logger.log('Stopping ' + monitor.name + '.');
-        monitor.stop();
-    });
-    removePidFile(pidDirectory() + 'tunnel.pid');
-    logger.log('Relay service shut down.');
-});
 
 /**
  * Forever is a Node.js process deamonizer. This should prevent the need for
  * manual interaction when one of the relays is unexpectedly stopped.
  */
 let forever = require('forever-monitor');
+/**
+ * Common Logger object to format logs.
+ */
+let logger = new require('./src/Logger')();
+
+/**
+ * Read in server configurations from the configuration file.
+ */
+try {
+    config = JSON.parse(require('fs').readFileSync('./config.json'));
+} catch (error) {
+    logger.error('Configuration file missing or improperly formatted.');
+    process.exit(1);
+}
 
 /**
  * Formats a string into an acceptable file name.
@@ -95,6 +85,26 @@ let isProcessRunning = function (pid) {
 
     return running;
 };
+
+if (require('fs').existsSync(pidDirectory() + 'tunnel.pid')) {
+    let pid = Number(require('fs').readFileSync(pidDirectory() + 'tunnel.pid'));
+
+    if (isProcessRunning(pid)) {
+        logger.log('Tunnel already running with PID ' + pid);
+        process.exit(0);
+    }
+}
+
+process.on('SIGTERM', () => {
+    logger.log('Main process going down via SIGTERM.');
+    logger.log('Stopping all children.');
+    children.forEach(function (monitor) {
+        logger.log('Stopping ' + monitor.name + '.');
+        monitor.stop();
+    });
+    removePidFile(pidDirectory() + 'tunnel.pid');
+    logger.log('Relay service shut down.');
+});
 
 /**
  * Binds necessary listeners to the child process.
@@ -226,11 +236,7 @@ for (let server in config.servers) {
 
             if (isProcessRunning(pid)) {
                 stopPreviousProcess(pid);
-            } else {
-                console.log('PID ' + pid + ' is not running.');
             }
-        } else {
-            console.log('No previous PID.');
         }
 
         child.start();
