@@ -21,6 +21,7 @@ process.on('SIGTERM', () => {
         logger.log('Stopping ' + monitor.name + '.');
         monitor.stop();
     });
+    removePidFile(pidDirectory() + 'tunnel.pid');
     logger.log('Relay service shut down.');
 });
 
@@ -77,6 +78,25 @@ let removePidFile = function (file) {
 };
 
 /**
+ * Check if a process if running.
+ *
+ * Note: If user does not have permissions to signal a process will return FALSE.
+ *
+ * @param pid
+ * @returns {boolean}
+ */
+let isProcessRunning = function (pid) {
+    let running = false;
+    try {
+        running = process.kill(pid, 0);
+    } catch (error) {
+        running = error.code === 'EPERM';
+    }
+
+    return running;
+};
+
+/**
  * Binds necessary listeners to the child process.
  *
  * @param child
@@ -93,6 +113,16 @@ function bindChildListeners(child, server) {
     child.on('start', event => {
         logger.log(server + ' started with PID ' + event.child.pid);
         writePidFile(pidFile, event.child.pid);
+    });
+
+    child.on('error', error => {
+        logger.log(server + ' threw an error: ' + error);
+        logger.log('Setting maximum retries for ' + server + ' to 10.');
+        child.max = 10;
+    });
+
+    child.on('stop', () => {
+        logger.log(server + ' was stopped by user.');
     });
 
     child.on('restart', event => {
@@ -161,7 +191,20 @@ function spawnChild(listen, send, host, name) {
 /**
  * Write the master PID file.
  */
-writePidFile('tunnel.pid', process.pid);
+writePidFile(pidDirectory() + 'tunnel.pid', process.pid);
+
+/**
+ * Stops a process with given signal or SIGKILL.
+ *
+ * @param pid
+ * @param signal
+ * @returns {*}
+ */
+let stopPreviousProcess = (pid, signal) => {
+    signal = signal || 'SIGKILL';
+    logger.log('Stopping process ' + pid + ' with ' + signal);
+    return process.kill(pid, signal);
+};
 
 /**
  * Setup each relay defined in the configuration file.
@@ -176,6 +219,19 @@ for (let server in config.servers) {
         );
         bindChildListeners(child, config.servers[server].name);
         children.push(child);
+
+        let pidFile = pidDirectory() + instanceFileName(config.servers[server].name) + '.pid';
+        if (require('fs').existsSync(pidFile)) {
+            let pid = Number(require('fs').readFileSync(pidFile));
+
+            if (isProcessRunning(pid)) {
+                stopPreviousProcess(pid);
+            } else {
+                console.log('PID ' + pid + ' is not running.');
+            }
+        } else {
+            console.log('No previous PID.');
+        }
 
         child.start();
     }
