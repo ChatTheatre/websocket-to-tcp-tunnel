@@ -71,7 +71,9 @@ let writePidFile = function (file, pid) {
  * @param file
  */
 let removePidFile = function (file) {
-    require('fs').unlinkSync(pidDirectory() + file);
+    if (require('fs').existsSync(pidDirectory() + file)) {
+        require('fs').unlinkSync(pidDirectory() + file);
+    }
 };
 
 /**
