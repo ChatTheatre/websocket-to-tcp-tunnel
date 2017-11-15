@@ -161,9 +161,10 @@ function bindChildListeners(child, server) {
  * @param send
  * @param host
  * @param name
+ * @param tunnelInfo
  * @returns {*}
  */
-function spawnChild(listen, send, host, name) {
+function spawnChild(listen, send, host, name, tunnelInfo = true) {
     let logDir = './logs/';
     if (config.logDirectory) {
         logDir = config.logDirectory.endsWith('/') ? config.logDirectory : config.logDirectory + '/';
@@ -177,7 +178,7 @@ function spawnChild(listen, send, host, name) {
             '--name=' + name,
             '--wsHeartbeat=' + (config.websocketHeartbeat || 15),
             '--shutdownDelay=' + config.shutdownDelay,
-            '--tunnelInfo=' + (config.sendTunnelInfo === undefined ? true : config.sendTunnelInfo)
+            '--tunnelInfo=' + tunnelInfo
         ],
         sourceDir: 'src',
         killTree: false,
@@ -222,11 +223,16 @@ let stopPreviousProcess = (pid, signal) => {
  */
 for (let server in config.servers) {
     if (config.servers.hasOwnProperty(server)) {
+        let sendInfo = true;
+        if (config.servers[server].sendTunnelInfo === false || config.servers[server].sendTunnelInfo === 'false') {
+            sendInfo = false;
+        }
         let child = spawnChild(
             config.servers[server].listen,
             config.servers[server].send,
             config.servers[server].host,
-            config.servers[server].name
+            config.servers[server].name,
+            sendInfo
         );
         bindChildListeners(child, config.servers[server].name);
         children.push(child);
