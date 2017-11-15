@@ -176,7 +176,8 @@ function spawnChild(listen, send, host, name) {
             '--host=' + host,
             '--name=' + name,
             '--wsHeartbeat=' + (config.websocketHeartbeat || 15),
-            '--shutdownDelay=' + config.shutdownDelay
+            '--shutdownDelay=' + config.shutdownDelay,
+            '--tunnelInfo=' + (config.sendTunnelInfo === undefined ? true : config.sendTunnelInfo)
         ],
         sourceDir: 'src',
         killTree: false,

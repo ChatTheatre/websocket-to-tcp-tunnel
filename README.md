@@ -25,7 +25,8 @@ Example (with all optional entries):
       "name": "My Server",
       "listen": 1234,
       "send": 1235,
-      "host": "domain.tld"
+      "host": "domain.tld",
+      "sendTunnelInfo": true
     }
   ]
 }
@@ -38,6 +39,8 @@ Servers can be configured by adding objects to the property.
 * `listen` is the port on which this server should listen for incoming WebSocket connections.
 * `send` is the port on which the outgoing TCP socket should connect.
 * `host` is the host to which the outgoing TCP socket should connect.
+* `sendTunnelInfo` is a boolean representing whether or not this information should be sent 
+on connection. The default is `true`.
 
 ### PID Files [OPTIONAL]
 The location of files containing PID information for each process can be defined with 

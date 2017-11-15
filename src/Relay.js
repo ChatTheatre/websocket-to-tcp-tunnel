@@ -100,10 +100,16 @@ webServer.on('connection', function (client, request) {
         client.tunnel.send(message);
     });
 
-    for (let header in request.headers) {
-        if (request.headers.hasOwnProperty(header)) {
-            client.tunnel.send('TUNNELINFO ' + header + ':' + request.headers[header] + "\n");
+    if (args.tunnelInfo) {
+        logger.log('Sending tunnel information.');
+
+        for (let header in request.headers) {
+            if (request.headers.hasOwnProperty(header)) {
+                client.tunnel.send('TUNNELINFO ' + header + ':' + request.headers[header] + "\n");
+            }
         }
+    } else {
+        logger.log('Tunnel information not being sent for ' + args.name);
     }
 });
 
