@@ -100,7 +100,7 @@ webServer.on('connection', function (client, request) {
         client.tunnel.send(message);
     });
 
-    if (args.tunnelInfo) {
+    if (args.tunnelInfo !== 'false') {
         logger.log('Sending tunnel information.');
 
         for (let header in request.headers) {
