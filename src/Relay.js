@@ -113,20 +113,22 @@ webServer.on('connection', function (client, request) {
     }
 });
 
-// Regularly ping the connections.
-logger.log('Starting heartbeat with ' + args.wsHeartbeat + ' second delay.');
-setInterval(() => {
-    webServer.clients.forEach(function each(client) {
-        if (client.isAlive === false) {
-            logger.log('Connection for ' + client.incoming_ip + ' closed due to lack of heartbeat.');
-            client.tunnel.close();
-            return client.terminate();
-        }
+if (args.wsHeartbeat > 0) {
+    // Regularly ping the connections.
+    logger.log('Starting heartbeat with ' + args.wsHeartbeat + ' second delay.');
+    setInterval(() => {
+        webServer.clients.forEach(function each(client) {
+            if (client.isAlive === false) {
+                logger.log('Connection for ' + client.incoming_ip + ' closed due to lack of heartbeat.');
+                client.tunnel.close();
+                return client.terminate();
+            }
 
-        client.isAlive = false;
-        client.ping('', false, true);
-    });
-}, args.wsHeartbeat * 1000);
+            client.isAlive = false;
+            client.ping('', false, true);
+        });
+    }, args.wsHeartbeat * 1000);
+}
 
 // Start-up message.
 logger.log(args.name + ' listening on port ' + args.listen);

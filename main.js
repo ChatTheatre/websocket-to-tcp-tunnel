@@ -176,7 +176,7 @@ function spawnChild(listen, send, host, name, tunnelInfo = true) {
             '--send=' + send,
             '--host=' + host,
             '--name=' + name,
-            '--wsHeartbeat=' + (config.websocketHeartbeat || 15),
+            '--wsHeartbeat=' + config.websocketHeartbeat,
             '--shutdownDelay=' + config.shutdownDelay,
             '--tunnelInfo=' + tunnelInfo
         ],
