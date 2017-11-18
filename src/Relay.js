@@ -17,9 +17,10 @@ let shutdown = (signal) => {
     logger.log(args.name + ' sending warning to all clients.');
     webServer.clients.forEach(function (client) {
         if (args.shutdownDelay > 0) {
-            client.send('!! CONNECTION BEING FORCED TO CLOSE IN ' + args.shutdownDelay + ' SECONDS. !!');
+            client.send('!! The connection to the game server will be restarted in ' + args.shutdownDelay + ' seconds. ' +
+                'This will temporarily disconnect you from the game. !!\n');
         } else {
-            client.send('!! CONNECTION BEING FORCED TO CLOSE IMMEDIATELY. !!');
+            client.send('!! The connection to the game server is being restarted. You will momentarily be disconnected from the game. !!\n');
             client.tunnel.close();
             client.terminate();
         }
@@ -28,6 +29,7 @@ let shutdown = (signal) => {
     if (args.shutdownDelay > 0) {
         setTimeout(() => {
             webServer.clients.forEach(function (client) {
+                client.send('!! Connection rebooting NOW. !!\n');
                 client.tunnel.close();
                 client.terminate();
             });
