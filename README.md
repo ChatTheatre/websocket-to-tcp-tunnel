@@ -2,6 +2,14 @@
 A basic relay between a listening WebSockets server and TCP server.  
 Data between both sockets is simply echoed to the other.
 
+## Use with the SkotOS Client
+
+You will most likely be using the `websocket-to-tcp-tunnel` with the orchil HTML5 client.
+
+For that setup, please read the [orchil README](https://github.com/skotostech/orchil/blob/master/README.md) for complete instructions on how to set up orchil, `nginx`, `apache`, and this tunnel to work together.
+
+If you are instead using the tunnel for some other purposes, and need to install it on its own (or if you want to better understand all of the configuration variables), read on.
+
 ## Requirements
 * Node.js - The WebSocket server runs via Node.js
 * npm - npm is used to install package dependencies.
