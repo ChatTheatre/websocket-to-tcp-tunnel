@@ -94,7 +94,7 @@ webServer.on('connection', function (client, request) {
         }
     });
     client.tunnel.connect(() => {
-        logger.log('Opened tunnel to TEC for ' + client.incoming_ip + '.');
+        logger.log('Opened tunnel to ' + args.name + ' for ' + client.incoming_ip + '.');
     });
 
     // When the WebSocket receives data relay it to the TCP tunnel.
