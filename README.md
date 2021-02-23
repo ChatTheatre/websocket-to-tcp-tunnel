@@ -66,7 +66,7 @@ This is useful in preventing runaway processes. If this property does not exist 
 
 ### Heartbeat Delay [OPTIONAL]
 The `websocketHeartbeat` will set the time between expected heartbeats for the Websocket client. 
-This is the number of seconds between consecutive heartbeats.  
+This is the number of seconds between consecutive heartbeats. When a heartbeat occurs, each connection will be sent a ping ("are you there?") and connections that do not reply will be disconnected.
 *Defaults to 15.* 
 
 ### Shutdown Delay [OPTIONAL]
