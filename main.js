@@ -122,7 +122,7 @@ function bindChildListeners(child, server) {
 
     child.on('start', event => {
         logger.log(server + ' started with PID ' + event.child.pid);
-        writePidFile(pidFile, event.child.pid);
+        writePidFile(pidFile, event.child.pid.toString());
     });
 
     child.on('error', error => {
@@ -143,7 +143,7 @@ function bindChildListeners(child, server) {
         logMessage += ' times now.';
 
         logger.log(logMessage);
-        writePidFile(pidFile, event.child.pid);
+        writePidFile(pidFile, event.child.pid.toString());
     });
 
     child.on('exit', () => {
@@ -203,7 +203,7 @@ function spawnChild(listen, send, host, name, tunnelInfo = true) {
 /**
  * Write the master PID file.
  */
-writePidFile(pidDirectory() + 'tunnel.pid', process.pid);
+writePidFile(pidDirectory() + 'tunnel.pid', process.pid.toString());
 
 /**
  * Stops a process with given signal or SIGKILL.
